@@ -21,16 +21,13 @@ from docutils import nodes
 from docutils.parsers.rst import directives
 from .textfield import *
 from sqlalchemy import Table
-from runestone.server.componentdb import addQuestionToDB, addHTMLToDB, engine, meta
+from runestone.server.componentdb import addQuestionToDB, addHTMLToDB, meta
 from runestone.common.runestonedirective import RunestoneIdDirective, RunestoneNode
 
 try:
     from html import escape  # py3
 except ImportError:
     from cgi import escape  # py2
-
-if engine:
-    Source_code = Table('source_code', meta, autoload=True, autoload_with=engine)
 
 def setup(app):
     app.add_directive('activecode', ActiveCode)
@@ -329,24 +326,6 @@ class ActiveCode(RunestoneIdDirective):
 
         course_name = env.config.html_context['course_id']
         divid = self.options['divid']
-
-        if engine:
-            engine.execute(Source_code.delete().where(Source_code.c.acid == divid).where(Source_code.c.course_id == course_name))
-            engine.execute(Source_code.insert().values(
-                acid = divid,
-                course_id = course_name,
-                main_code= source,
-                suffix_code = suffix,
-                includes = self.options['include'],
-                available_files = self.options.get('available_files', "")
-            ))
-        else:
-            print("Unable to save to source_code table in activecode.py. Possible problems:")
-            print("  1. dburl or course_id are not set in conf.py for your book")
-            print("  2. unable to connect to the database using dburl")
-            print("")
-            print("This should only affect the grading interface. Everything else should be fine.")
-
 
         acnode = ActivcodeNode(self.options, rawsource=self.block_text)
         acnode.source, acnode.line = self.state_machine.get_source_and_line(self.lineno)

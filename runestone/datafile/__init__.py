@@ -20,7 +20,7 @@ __author__ = 'isaiahmayerchak'
 from docutils import nodes
 from docutils.parsers.rst import directives
 from sqlalchemy import Table
-from runestone.server.componentdb import engine, meta
+from runestone.server.componentdb import meta
 from runestone.common.runestonedirective import RunestoneIdDirective, RunestoneNode
 
 def setup(app):
@@ -145,24 +145,6 @@ class DataFile(RunestoneIdDirective):
             self.options['edit'] = "true"
         else:
             self.options['edit'] = "false"
-
-        if engine:
-            Source_code = Table('source_code', meta, autoload=True, autoload_with=engine)
-            course_name = env.config.html_context['course_id']
-            divid = self.options['divid']
-
-            engine.execute(Source_code.delete().where(Source_code.c.acid == divid).where(Source_code.c.course_id == course_name))
-            engine.execute(Source_code.insert().values(
-                acid = divid,
-                course_id = course_name,
-                main_code= source,
-            ))
-        else:
-            print("Unable to save to source_code table in datafile__init__.py. Possible problems:")
-            print("  1. dburl or course_id are not set in conf.py for your book")
-            print("  2. unable to connect to the database using dburl")
-            print()
-            print("This should only affect the grading interface. Everything else should be fine.")
 
 
         data_file_node = DataFileNode(self.options, rawsource=self.block_text)
