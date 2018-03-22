@@ -1,5 +1,4 @@
 click
-Paver>=1.2.4
 six
 Sphinx==1.6.3
 sphinxcontrib-paverutils>=1.13,<=1.16
