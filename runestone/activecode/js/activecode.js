@@ -1299,7 +1299,13 @@ AudioTour.prototype.tour = function (divid, audio_type, bcount) {
         var temp_line = temp[0];
         var temp_aname = temp[1];
 
-        var akey = temp_aname.substring(1, temp_aname.length);
+		// https://stackoverflow.com/a/9743702/6381767
+		// *You should not be using your values as identifiers.*
+		// BUG: name collisions between `a/f` and `a_f`
+		// TODO: move to hash based ids 
+
+        var filename = temp_aname.substring(1, temp_aname.length);
+		var akey = filename.replace(/[^a-z0-9]/i, '_');
         var lnums = temp_line.substring(1, temp_line.length);
 
         //alert("akey:"+akey+"lnum:"+lnums);
@@ -1311,10 +1317,10 @@ AudioTour.prototype.tour = function (divid, audio_type, bcount) {
         //var dir = "http://media.interactivepython.org/" + eBookConfig.basecourse.toLowerCase() + "/audio/";
         var dir = "../_static/audio/"
         str += "<audio id=" + akey + " preload='auto' >";
-        str += "<source src='" + dir + akey + ".wav' type='audio/wav'>";
-        str += "<source src='" + dir + akey + ".mp3' type='audio/mpeg'>";
-        str += "<source src='" + dir + akey + ".wav' type='audio/wav'>";
-        str += "<source src='" + dir + akey + ".mp3' type='audio/mpeg'>";
+        str += "<source src='" + dir + filename + ".wav' type='audio/wav'>";
+        str += "<source src='" + dir + filename + ".mp3' type='audio/mpeg'>";
+        str += "<source src='" + dir + filename + ".wav' type='audio/wav'>";
+        str += "<source src='" + dir + filename + ".mp3' type='audio/mpeg'>";
         str +=  "<br />Your browser does not support the audio tag</audio>";
         this.ahash[akey] = lnums;
         this.aname.push(akey);
